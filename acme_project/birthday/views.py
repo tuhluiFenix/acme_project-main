@@ -1,37 +1,40 @@
-from .forms import BirthdayForm
-from .models import Birthday
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import (
+    CreateView, DeleteView, DetailView, ListView, UpdateView
+)
 from django.urls import reverse_lazy
 
+from .forms import BirthdayForm
+from .models import Birthday
+from .utils import calculate_birthday_countdown
 
-# Создаём миксин.
-class BirthdayMixin:
+
+class BirthdayListView(ListView):
+    model = Birthday
+    ordering = 'id'
+    paginate_by = 10
+
+
+class BirthdayCreateView(CreateView):
     model = Birthday
     form_class = BirthdayForm
-    template_name = 'birthday/birthday.html'
+
+
+class BirthdayUpdateView(UpdateView):
+    model = Birthday
+    form_class = BirthdayForm
+
+
+class BirthdayDeleteView(DeleteView):
+    model = Birthday
     success_url = reverse_lazy('birthday:list')
 
 
-class BirthdayFormMixin:
-    form_class = BirthdayForm
-    template_name = 'birthday/birthday.html'
+class BirthdayDetailView(DetailView):
+    model = Birthday
 
-
-# Добавляем миксин первым по списку родительских классов.
-class BirthdayCreateView(BirthdayMixin, CreateView):
-    # Не нужно описывать атрибуты: все они унаследованы от BirthdayMixin.
-    pass
-
-
-class BirthdayListView(BirthdayMixin, ListView):
-    # Не нужно описывать атрибуты: все они унаследованы от BirthdayMixin.
-    pass
-
-
-class BirthdayUpdateView(BirthdayMixin, UpdateView):
-    # И здесь все атрибуты наследуются от BirthdayMixin.
-    pass
-
-
-class BirthdayDeleteView(BirthdayFormMixin, DeleteView):
-    pass
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['birthday_countdown'] = calculate_birthday_countdown(
+            self.object.birthday
+        )
+        return context

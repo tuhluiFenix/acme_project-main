@@ -7,7 +7,9 @@ from .validators import real_age
 
 from .models import Birthday
 
-BEATLES = {'Иван Иванов', 'Антон Бондаренко', 'Сергей Жуков', 'Александр Петров'}
+BEATLES = {'Иван Иванов', 'Антон Бондаренко', 'Сергей Жуков', 
+           'Александр Петров'}
+
 
 class BirthdayForm(forms.ModelForm):
     first_name = forms.CharField(label='Имя', max_length=20)
@@ -42,4 +44,4 @@ class BirthdayForm(forms.ModelForm):
         if f'{first_name} {last_name}' in BEATLES:
             raise ValidationError(
                 'Мы вас не любим!'
-            ) 
+            )
